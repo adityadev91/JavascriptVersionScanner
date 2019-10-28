@@ -6,7 +6,7 @@ module JSLibraryScanner
   class ScannerUtils
     def self.run
       hash_library_version = get_versions_of_js_libraries
-      pp hash_library_version
+      is_library_version(hash_library_version)
     end
 
     def self.get_list_of_js_file_paths
@@ -40,11 +40,23 @@ module JSLibraryScanner
           if version.length > 0
             list_of_versions.push version
           else
-            list_of_versions.push "Probably better regexp needed?"
+            # list_of_versions.push "Probably better regexp needed?"
           end
         end
       end
       list_of_versions
+    end
+
+    def self.is_library_version(hash_library_version)
+      hash_library_version.each do |library, version|
+        version = version.flatten.compact[0]
+        library = library[0..-4]
+        puts library
+        puts version
+        if version and version.length > 0
+          system("snyk test #{library}@#{version}")
+        end
+      end
     end
 
     def self.get_file_content(file_path)
